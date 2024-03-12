@@ -1,7 +1,7 @@
 <template>
   <component :is="hiddenBlockquote ? 'div' : 'blockquote'">
     <template v-if="isObject(data) && data">
-      <button class="braces" @click="show = !show">
+      <q-btn type="button" class="braces" @click="show = !show">
         {{ '#' }}
         <template v-if="!hiddenBlockquote">{{ title ? title : '' }}</template>
 
@@ -9,7 +9,7 @@
           show ? ' [' : ' [...'
         }}</template>
         <template v-else>{{ show ? ' {' : ' {...' }}</template>
-      </button>
+      </q-btn>
       <div v-show="show">
         <div class="item" v-for="(value, key, i) in data" v-bind:key="i">
           <span class="keyname">{{ key }}:</span>
