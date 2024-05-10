@@ -1,100 +1,127 @@
 <template>
-  <component :is="hiddenBlockquote ? 'div' : 'blockquote'">
-    <template v-if="isObject(data) && data">
-      <q-btn type="button" class="braces" @click="show = !show">
-        {{ '#' }}
-        <template v-if="!hiddenBlockquote">{{ title ? title : '' }}</template>
+    <component :is="hiddenBlockquote ? 'div' : 'blockquote'" :class="className">
+        <template v-if="isObject(data) && data">
+            <button
+                type="button"
+                class="braces"
+                padding="none"
+                @click="show = !show"
+            >
+                {{ "#" }}
+                <template v-if="!hiddenBlockquote">{{
+                    title ? title : ""
+                }}</template>
 
-        <template v-if="Array.isArray(data)">{{
-          show ? ' [' : ' [...'
-        }}</template>
-        <template v-else>{{ show ? ' {' : ' {...' }}</template>
-      </q-btn>
-      <div v-show="show">
-        <div class="item" v-for="(value, key, i) in data" v-bind:key="i">
-          <span class="keyname">{{ key }}:</span>
-          <Dump :data="value" :hidden-blockquote="true"></Dump>
-        </div>
-      </div>
-      <span class="braces close">
-        <template v-if="Array.isArray(data)">{{ ']' }}</template>
-        <template v-else>{{ '}' }}</template>
-      </span>
-    </template>
-    <template v-else-if="data">
-      <span
-        :class="{
-          is_string: checkTypeOf(data, 'string'),
-          is_number: checkTypeOf(data, 'number'),
-          is_boolean: checkTypeOf(data, 'boolean')
-        }"
-        >{{ checkTypeOf(data, 'string') ? `"${data}"` : data }}</span
-      >
-    </template>
-    <template v-else-if="checkTypeOf(data, 'undefined')">
-      <span class="is_null">undefined</span>
-    </template>
-    <template v-else>
-      <span class="is_null">null</span>
-    </template>
-  </component>
+                <template v-if="Array.isArray(data)">{{
+                    show ? " [" : " [..."
+                }}</template>
+                <template v-else>{{ show ? " {" : " {..." }}</template>
+            </button>
+            <div v-show="show">
+                <div
+                    class="item"
+                    v-for="(value, key, i) in data"
+                    v-bind:key="i"
+                >
+                    <span class="keyname">{{ key }}:</span>
+                    <Dump :data="value" :hidden-blockquote="true"></Dump>
+                </div>
+            </div>
+            <span class="braces close">
+                <template v-if="Array.isArray(data)">{{ "]" }}</template>
+                <template v-else>{{ "}" }}</template>
+            </span>
+        </template>
+        <template v-else-if="data">
+            <span
+                :class="{
+                    is_string: checkTypeOf(data, 'string'),
+                    is_number: checkTypeOf(data, 'number'),
+                    is_boolean: checkTypeOf(data, 'boolean'),
+                }"
+                >{{ checkTypeOf(data, "string") ? `"${data}"` : data }}</span
+            >
+        </template>
+        <template v-else-if="checkTypeOf(data, 'undefined')">
+            <span class="is_null">undefined</span>
+        </template>
+        <template v-else-if="typeof data == 'boolean'">
+            <span class="is_boolean">{{data}}</span>
+        </template>
+        <template v-else>
+            <span class="is_null">null</span>
+        </template>
+    </component>
 </template>
 <script lang="ts" setup>
-import { defineProps, ref } from 'vue'
+import { computed, defineProps, ref } from "vue";
 
-defineProps(['data', 'hiddenBlockquote', 'title'])
+const props = defineProps(["data", "hiddenBlockquote", "title", "fixed"]);
 
-const show = ref(false)
+const show = ref(false);
 
 const isObject = (value: unknown) => {
-  return ['object'].includes(typeof value)
-}
+    return ["object"].includes(typeof value);
+};
 
 const checkTypeOf = (value: unknown, typeName: string) => {
-  return String(typeof value) === typeName
-}
+    return String(typeof value) === typeName;
+};
+
+const className = computed(() => {
+    return props.fixed && !props.hiddenBlockquote ? "is_fixed" : "not_fixed";
+});
 </script>
 <style scoped>
 blockquote {
-  max-height: 50vh;
-  overflow-y: auto;
-  background-color: black;
-  color: white;
-  padding: 15px;
-  margin: 10px 0;
+    max-height: 50vh;
+    overflow-y: auto;
+    background-color: black;
+    color: white;
+    padding: 15px;
+    margin: 10px 0;
+}
+
+blockquote.is_fixed {
+    margin-bottom: 0;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
 }
 
 .item {
-  display: flex;
-  gap: 5px;
-  padding-left: 35px;
+    display: flex;
+    gap: 5px;
+    padding-left: 35px;
 }
 
 .braces {
-  background-color: transparent;
-  padding: 0;
-  border: none;
-  color: rgb(14, 172, 245);
-  cursor: pointer;
+    background-color: transparent;
+    padding: 0;
+    border: none;
+    color: rgb(14, 172, 245);
+    cursor: pointer;
 }
 
 .keyname {
-  color: palevioletred;
+    color: palevioletred;
 }
 
 .is_number {
-  color: green;
+    color: green;
 }
 
 .is_string {
-  color: orange;
+    color: orange;
 }
 
 .is_boolean {
-  color: purple;
+    color: purple;
 }
 
 .is_null {
-  color: blue;
+    color: blue;
 }
 </style>
